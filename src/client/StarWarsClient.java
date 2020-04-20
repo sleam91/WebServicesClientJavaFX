@@ -13,7 +13,7 @@ import model.StarWarsPlanet;
 public class StarWarsClient {
     
     Client client = ClientBuilder.newClient();
-    WebTarget target = client.target("https://swapi.co/api/planets/{i}");
+    WebTarget target = client.target("https://swapi.dev/api/planets/{i}/");
 
     public StarWarsPlanet findStarWarsPlanetById(String id) {
 
@@ -28,7 +28,7 @@ public class StarWarsClient {
     }
 
     public List<StarWarsPlanet> getAll() {
-        String next = "https://swapi.co/api/planets/";
+        String next = "https://swapi.dev/api/planets/";
         List<StarWarsPlanet> planetResult = new ArrayList<>();
 
         while (next != null) {
@@ -36,7 +36,8 @@ public class StarWarsClient {
             AllPlanets planets = localTarget.request(MediaType.APPLICATION_JSON).get(AllPlanets.class);
 
             try {
-                next = planets.getNext();
+                next = planets.getNext().replace("http", "https");
+                
             } catch (NullPointerException e) {
                 next = null;
             }
@@ -49,7 +50,7 @@ public class StarWarsClient {
     }
 
     public List<StarWarsPlanet> getAllSearched(String search) {
-        String next = "https://swapi.co/api/planets/?search={i}";
+        String next = "https://swapi.dev/api/planets/?search={i}";
         
         WebTarget localTarget = client.target(next).resolveTemplate("i", search);
         
@@ -60,7 +61,7 @@ public class StarWarsClient {
             AllPlanets planets = localTarget.request(MediaType.APPLICATION_JSON).get(AllPlanets.class);
 
             try {
-                next = planets.getNext();
+                next = planets.getNext().replace("http", "https");
                 localTarget = client.target(next);
             } catch (NullPointerException e) {
                 next = null;
